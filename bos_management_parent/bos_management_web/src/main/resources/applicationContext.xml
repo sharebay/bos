@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:elasticsearch="http://www.springframework.org/schema/data/elasticsearch"
+       xsi:schemaLocation="
+						http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/data/jpa
+						http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+						http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+						http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+						http://www.springframework.org/schema/data/elasticsearch
+						http://www.springframework.org/schema/data/elasticsearch/spring-elasticsearch-1.0.xsd">
+
+    <!-- jdbc.properties文件路径配置 -->
+    <context:property-placeholder location="classpath:druid.properties"/>
+    <!-- DataSource配置 -->
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="initialSize" value="${jdbc.initialSize}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}"></property>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}"></property>
+        <property name="testOnBorrow" value="${jdbc.testOnBorrow}"></property>
+        <property name="maxActive" value="${jdbc.maxActive}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="testOnReturn" value="${jdbc.testOnReturn}"></property>
+        <property name="filters" value="${jdbc.filters}"></property>
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="${jdbc.maxPoolPreparedStatementPerConnectionSize}"></property>
+        <property name="driverClassName" value="${jdbc.driverClassName}"></property>
+        <property name="maxWait" value="${jdbc.maxWait}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="testWhileIdle" value="${jdbc.testWhileIdle}"></property>
+        <property name="validationQuery" value="${jdbc.validationQuery}"></property>
+        <property name="poolPreparedStatements" value="${jdbc.poolPreparedStatements}"></property>
+    </bean>
+
+    <!-- spring整合JPA -->
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="packagesToScan" value="com.fly.bos.domain" />
+        <!-- 指定持久层提供者为Hibernate -->
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.ejb.HibernatePersistence" />
+        </property>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <!-- 自动建表 -->
+                <property name="generateDdl" value="true" />
+                <property name="database" value="MYSQL" />
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+                <property name="showSql" value="true" />
+            </bean>
+        </property>
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+        </property>
+    </bean>
+
+    <!-- 事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+    <!-- 组件扫描 @Server @Controller @Repository -->
+    <context:component-scan base-package="com.fly.bos.service,com.fly.bos.web"/>
+
+    <!-- 事务注解支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+
+    <!-- 整合 spring data jpa -->
+    <jpa:repositories base-package="com.fly.bos.dao" />
+
+    <!--cxf服务-->
+    <!--<bean id="orderRemoteService" class="com.fly.bos.service.impl.OrderRemoteServiceImpl"/>-->
+    <jaxrs:server address="/orderService">
+        <jaxrs:serviceBeans>
+            <ref bean="orderRemoteService"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxrs:server address="/promotionService">
+        <jaxrs:serviceBeans>
+            <ref bean="promotionRemoteService"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+
+    <!--elasticsearch 配置-->
+    <!-- 扫描index包，自动创建实例 -->
+    <elasticsearch:repositories base-package="com.fly.bos.index"/>
+
+    <!-- 配置elasticSearch的连接 -->
+    <elasticsearch:transport-client id="client" cluster-nodes="localhost:9300" />
+
+    <!-- spring data elasticSearcheDao 必须继承 ElasticsearchTemplate -->
+    <bean id="elasticsearchTemplate" class="org.springframework.data.elasticsearch.core.ElasticsearchTemplate">
+        <constructor-arg name="client" ref="client"></constructor-arg>
+    </bean>
+    <!--shiro配置-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/index.jsp"/>
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <property name="filterChainDefinitions">
+            <value>
+                /login.jsp = anon
+                /js/** = anon
+                /css/** = anon
+                /images/** = anon
+                /validatecode.jsp* = anon
+                /user/login.action = anon
+                /** = authc
+            </value>
+        </property>
+    </bean>
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="loginRealm"></property>
+        <property name="cacheManager" ref="ehcacheManager"></property>
+    </bean>
+    <bean id="loginRealm" class="com.fly.bos.service.LoginRealm"></bean>
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <bean id="defaultAdvisorAutoProxyCreator"  class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
+        <!--
+            两种代理方式：
+            第一种：cglib动态代理，基于继承实现
+                UserAction - 目标类
+                ProxyAction extends UserAction- 代理类
+            第二种：java动态代理，基于接口实现
+                UserAction implements ModelDriven - 目标类
+                ProxyAction implements ModelDriven - 代理类
+            proxyTargetClass:设置使用哪种方式生成代理类，true-第一种cglib；false-第二种java，默认值是false
+         -->
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+    <!-- 切面 -->
+    <bean id="authorizationAttributeSourceAdvisor" class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+    <!--ehcache缓存-->
+    <bean id="ehcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"></property>
+    </bean>
+</beans>

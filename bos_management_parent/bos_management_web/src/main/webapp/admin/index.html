@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>后台管理系统</title>
+<link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+<link rel="stylesheet"
+	href="./plugins/font-awesome/css/font-awesome.min.css" media="all">
+<link rel="stylesheet" href="./build/css/app.css" media="all">
+<link rel="stylesheet" href="./build/css/themes/blue.1.css" media="all">
+
+<!--zTree-->
+<link rel="stylesheet" href="./ztree/css/metroStyle/metroStyle.css"
+	type="text/css">
+<script type="text/javascript" src="./ztree/js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="./ztree/js/jquery.ztree.core.js"></script>
+<script src="./plugins/layui/layui.js"></script>
+
+<script>
+        function messageAlert() {
+            layer.msg('同上', {
+                icon: 1,
+                time: 1000 //2秒关闭（如果不配置，默认是3秒）
+            });
+        }
+        function addTab(obj) {
+            var dataOptions = $(obj).attr("data-options");
+            var json = eval('(' + dataOptions + ')');
+            tab.tabAdd(json);
+        }
+    </script>
+
+</head>
+
+<body class="kit-theme">
+	<div class="layui-layout layui-layout-admin kit-layout-admin">
+		<!--页眉-->
+		<div class="layui-header">
+			<div class="layui-logo kit-side-fold">
+				<a href="javascript:;"> 后台管理 </a>
+			</div>
+			<div class="layui-logo kit-logo-mobile">K</div>
+
+			<ul class="layui-nav layui-layout-right kit-nav">
+				<li class="layui-nav-item"><a href="javascript:;"> <img
+						src="src/images/0.jpg" class="layui-nav-img"> 郭小小
+				</a>
+					<dl class="layui-nav-child">
+						<dd>
+							<a href="javascript:;" kit-target
+								data-options="{url:'basic.html',icon:'&#xe658;',title:'基本资料',id:'966'}"><span>基本资料</span></a>
+						</dd>
+						<dd>
+							<a href="javascript:;">安全设置</a>
+						</dd>
+					</dl></li>
+				<li class="layui-nav-item"><a href="/bos_management_web/user/logout.action"><i
+						class="fa fa-sign-out" aria-hidden="true"></i> 注销</a></li>
+			</ul>
+		</div>
+
+		<!--左侧菜单-->
+		<div class="layui-side layui-bg-black kit-side">
+			<div class="layui-side-scroll">
+				<div class="kit-side-fold">
+					<i class="fa fa-navicon" aria-hidden="true"></i>
+				</div>
+				<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+				<ul class="layui-nav layui-nav-tree" lay-filter="kitNavbar"
+					kit-navbar>
+
+					<li class="layui-nav-item"><a class="" href="javascript:;"><i
+							class="fa fa-plug" aria-hidden="true"></i><span>系统管理</span></a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="javascript:;" kit-target
+									data-options="{url:'../pages/system/menu.jsp',icon:'&#xe6c6;',title:'菜单管理',id:'admin1001'}">
+									<i class="layui-icon">&#xe6c6;</i><span> 菜单管理</span>
+								</a>
+							</dd>
+							<dd>
+								<a href="javascript:;" kit-target
+									data-options="{url:'../pages/system/permission.jsp',icon:'&#xe6c6;',title:'权限管理',id:'admin1002'}"><i
+									class="fa fa-user" aria-hidden="true"></i><span> 权限管理</span></a>
+							</dd>
+							<dd>
+								<a href="javascript:;" kit-target
+									data-options="{url:'../pages/system/role.jsp',icon:'&#xe6c6;',title:'角色管理',id:'admin1003'}"><i
+									class="layui-icon">&#xe628;</i><span> 角色管理</span></a>
+							</dd>
+							<dd>
+								<a href="javascript:;" kit-target
+									data-options="{url:'../pages/system/user.jsp',icon:'&#xe6c6;',title:'用户管理',id:'admin1004'}"><i
+									class="layui-icon">&#xe614;</i><span> 用户管理</span></a>
+							</dd>
+							<dd>
+								<a href="javascript:;" kit-target
+									data-options="{url:'https://www.baidu.com',icon:'&#xe658;',title:'百度一下',id:'5'}"><i
+									class="layui-icon">&#xe658;</i><span> 百度一下</span></a>
+							</dd>
+						</dl>
+					</li>
+
+					<li class="layui-nav-item"><a class="" href="javascript:;"><i
+							class="fa fa-plug" aria-hidden="true"></i><span>基本功能</span></a>
+						<dl class="layui-nav-child">
+							<div class="ztree-div">
+								<ul id="treeMenu" class="ztree"></ul>
+							</div>
+						</dl>
+					</li>
+					
+					<!--普通组件测试-->
+					<li class="layui-nav-item"><a class="" href="javascript:;"><i
+							class="fa fa-plug" aria-hidden="true"></i><span>组件测试</span></a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="javascript:;" onclick="messageAlert()"> <i
+									class="layui-icon">&#xe6c6;</i><span> 消息框测试</span></a>
+							</dd>
+							<dd>
+								<a href="javascript:;" onclick="addTab(this)"
+									data-options="{url:'ztree.html',icon:'&#xe6c6;',title:'zTree',id:'zTree'}">
+									<i class="layui-icon">&#xe6c6;</i><span> zTree测试</span>
+								</a>
+							</dd>
+						</dl>
+					</li>
+
+					<li class="layui-nav-item"><a class="" href="javascript:;"><i
+							class="fa fa-plug" aria-hidden="true"></i><span> 基本元素</span></a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="javascript:;" data-url="list4.html"
+									data-icon="&#xe614;" data-title="列表四" kit-target data-id='4'><i
+									class="layui-icon">&#xe614;</i><span> 列表四</span></a>
+							</dd>
+							<dd>
+								<a href="javascript:;" kit-target
+									data-options="{url:'https://www.baidu.com',icon:'&#xe658;',title:'百度一下',id:'5'}"><i
+									class="layui-icon">&#xe658;</i><span> 百度一下</span></a>
+							</dd>
+						</dl></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- 内容主体区域 -->
+		<div class="layui-body" id="container">
+			<div style="padding: 15px;">请稍等...</div>
+		</div>
+
+		<!-- 底部固定区域 -->
+		<div class="layui-footer">
+			2017 &copy; <a href="javascript:;" style="color: blue">东风快递，洲际快递</a>
+			你值得拥有
+		</div>
+
+	</div>
+	<script>
+    layui.config({
+        base: 'build/js/',
+        version: '1.0.1'
+    }).use(['app', 'message'], function() {
+        var app = layui.app,
+            $ = layui.jquery,
+            layer = layui.layer;
+        //将message设置为全局以便子页面调用
+        message = layui.message;
+        //主入口
+        app.set({
+//            type: 'page'
+            type: 'iframe'
+        }).init();
+    });
+
+    /*zTree*/
+    $(function () {
+        var setting = {
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                onClick: function (event, treeId, treeNode) {
+                    //如果节点存在options属性，则该节点为叶子结点，可以添加Tab
+                    var page = treeNode.page;
+                    var tabTitle = treeNode.name;
+                    var tabId = 'menu' + treeNode.id;
+                    if (page != undefined) {
+                        tab.tabAdd({
+                            url: "../" + page,
+                            icon:'&#xe6c6;',
+                            title: tabTitle,
+                            id:tabId
+                        });
+                    }
+                }
+            }
+        };
+
+        // 基本功能菜单加载
+        $.post("./datas/menu.json",function(data){
+            $.fn.zTree.init($("#treeMenu"), setting, data);
+        },"json");
+
+        $(".ztree-div a").css({all:"initial"});
+    });
+
+
+</script>
+
+</body>
+
+</html>

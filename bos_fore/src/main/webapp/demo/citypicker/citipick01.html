@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../../js/self/city-picker.data.js"></script>
+    <script type="text/javascript" src="../../js/self/city-picker.js"></script>
+    <script type="text/javascript" src="../../js/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/city-picker.css">
+</head>
+<body>
+<h1>City Picker test01</h1>
+<div style="position: relative">
+    <input id="citypicker" readonly type="text">
+</div>
+
+<script>
+    $(function() {
+        $("#citypicker").citypicker();
+    });
+
+    function calc(a, b, calculator) {
+        return calculator(a, b);
+    }
+
+    window.onload = function () {
+        var result = calc(100, 220, function (a, b) {
+            return a - b;
+        });
+        alert(result);
+    }
+</script>
+</body>
+</html>
