@@ -132,7 +132,6 @@ public class AreaAction extends BaseAction<Area, String>  {
 				if (StringUtils.isNotBlank(district)) {
 					predicates.add(cb.like(root.get("district").as(String.class), "%" + district + "%"));
 				}
-				
 				Predicate[] arrayPredicates = new Predicate[predicates.size()];
 				return cb.and(predicates.toArray(arrayPredicates));
 			}

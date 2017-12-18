@@ -149,4 +149,25 @@
     <bean id="ehcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
         <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"></property>
     </bean>
+
+    <!--quartz配置-->
+    <bean name="mailJob" class="com.fly.bos.web.quartz.MailJob"></bean>
+    <bean name="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="mailJob"></property>
+        <property name="targetMethod" value="sendMail"></property>
+    </bean>
+    <bean name="trigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail"></property>
+        <property name="cronExpression">
+            <value>0 0/10 * * * ?</value>
+        </property>
+    </bean>
+    <bean name="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="trigger"></ref>
+            </list>
+        </property>
+    </bean>
+    
 </beans>
